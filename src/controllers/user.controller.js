@@ -29,7 +29,17 @@ userRouter.post("/", (req, res) => {
   responses.success(res, "user created successfully", value);
 }); // TODO create a new user
 
-userRouter.put("/", (req, res) => {}); // TODO update a user
+userRouter.put("/:id", (req, res) => {
+  const sqlQuery = "UPDATE users SET name=?, email=?, password=? WHERE id = ?";
+  const id = req.params.id;
+  const val = req.body;
+  const hashedPass = bcrypt.hashSync(val.password, parseInt(process.env.SALT));
+  conn.query(sqlQuery, [val.name, val.email, hashedPass, id], (err, result) => {
+    if (err) responses.badRequest(res, err);
+    responses.success(res, "user edited successfully");
+  });
+}); // TODO update a user
+
 userRouter.delete("/", (req, res) => {}); // TODO delete a user
 userRouter.post("/login", (req, res) => {}); // TODO login user
 
